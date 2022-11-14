@@ -456,6 +456,49 @@ func (u *Service) IsUserAdmin(claims *UJWTClaims) bool {
 	return false
 }
 
+func (u *Service) RequestWithClaims(path string, method string, header http.Header, body io.ReadCloser, claims SJWTClaims) (*http.Response, error) {
+
+	if path == "" || method == "" {
+		return nil, errors.New("Failed")
+	}
+
+	token := u.SJwt.GenerateJWT(claims)
+	client := &http.Client{}
+	req, _ := http.NewRequest(path, method, body)
+
+	if header != nil {
+		req.Header = header
+	}
+	req.Header.Set("Authorization", u.SJwt.AuthType+" "+token)
+	res, errn := client.Do(req)
+	if errn != nil || res.StatusCode != 200 {
+		return nil, errors.New("Failed")
+	}
+
+	return res, nil
+}
+
+func (u *Service) Request(path string, method string, header http.Header, body io.ReadCloser) (*http.Response, error) {
+
+	if path == "" || method == "" {
+		return nil, errors.New("Failed")
+	}
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(path, method, body)
+
+	if header != nil {
+		req.Header = header
+	}
+
+	res, errn := client.Do(req)
+	if errn != nil || res.StatusCode != 200 {
+		return nil, errors.New("Failed")
+	}
+
+	return res, nil
+}
+
 func (u *Service) GWRequest(url string, method string, header http.Header, body io.ReadCloser, claims SJWTClaims) (*http.Response, error) {
 
 	if url == "" || method == "" {
