@@ -464,7 +464,11 @@ func (u *Service) RequestWithClaims(path string, method string, header http.Head
 
 	token := u.SJwt.GenerateJWT(claims)
 	client := &http.Client{}
-	req, _ := http.NewRequest(path, method, body)
+	req, e := http.NewRequest(method, path, body)
+
+	if e != nil {
+		return nil, errors.New("Request issue")
+	}
 
 	if header != nil {
 		req.Header = header
@@ -485,7 +489,11 @@ func (u *Service) Request(path string, method string, header http.Header, body i
 	}
 
 	client := &http.Client{}
-	req, _ := http.NewRequest(path, method, body)
+	req, e := http.NewRequest(method, path, body)
+
+	if e != nil {
+		return nil, errors.New("Request issue")
+	}
 
 	if header != nil {
 		req.Header = header
