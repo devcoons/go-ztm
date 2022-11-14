@@ -573,6 +573,19 @@ func (u *Service) RequestForwarder(c *gin.Context) {
 }
 
 func (u *Service) servicesHealthCheck() {
+	var tServicesSts []ServicesStatus
+
+	for _, nodeDetails := range u.Config.Services {
+		var sclaims SJWTClaims
+		sclaims.Auth = false
+		sclaims.Role = 0
+		sclaims.UserId = -1
+		sclaims.Service = u.Config.Ims.Abbeviation
+		sclaims.SysAdm = false
+		sclaims.Hop = 1
+		tServicesSts = append(tServicesSts, ServicesStatus{Name: nodeDetails.Name, IsAlive: false})
+	}
+	u.ServicesSts = tServicesSts
 
 	for {
 		var tServicesSts []ServicesStatus
@@ -593,7 +606,7 @@ func (u *Service) servicesHealthCheck() {
 }
 
 func (u *Service) serviceHealthPing(url string, token string) bool {
-	client := &http.Client{}
+	client := &http.Client{Timeout: 5 * time.Second}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Del("Authorization")
 	req.Header.Add("Authorization", u.SJwt.AuthType+" "+token)
