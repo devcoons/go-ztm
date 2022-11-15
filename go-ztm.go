@@ -676,15 +676,15 @@ func (u *Service) serviceHealthPing(url string, token string) (bool, []map[strin
 
 func (u *Service) Start(router *gin.Engine) {
 
-	router.GET("/system/services/status", func(c *gin.Context) {
+	router.GET(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/services/status", "//", "/"), func(c *gin.Context) {
 		c.IndentedJSON(200, u.ServicesSts)
 	})
 
-	router.GET("/system/gateways", func(c *gin.Context) {
+	router.GET(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/gateways", "//", "/"), func(c *gin.Context) {
 		c.IndentedJSON(200, u.Config.Gateways)
 	})
 
-	router.GET("/system/configuration", func(c *gin.Context) {
+	router.GET(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/configuration", "//", "/"), func(c *gin.Context) {
 		claims := u.ValidateUserJWT(c.Request)
 		if !u.IsUserAdmin(claims) {
 			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0001", Message: "Admin only operation."})
@@ -693,7 +693,7 @@ func (u *Service) Start(router *gin.Engine) {
 		c.IndentedJSON(http.StatusOK, u.Config)
 	})
 
-	router.POST("/system/services", func(c *gin.Context) {
+	router.POST(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/services", "//", "/"), func(c *gin.Context) {
 		claims := u.ValidateUserJWT(c.Request)
 		if !u.IsUserAdmin(claims) {
 			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0002", Message: "Admin only operation."})
@@ -717,7 +717,7 @@ func (u *Service) Start(router *gin.Engine) {
 		c.Data(200, "application/json", nil)
 	})
 
-	router.PUT("/system/configuration", func(c *gin.Context) {
+	router.PUT(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/configuration", "//", "/"), func(c *gin.Context) {
 		claims := u.ValidateUserJWT(c.Request)
 		if !u.IsUserAdmin(claims) {
 			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0003", Message: "Admin only operation."})
@@ -732,7 +732,7 @@ func (u *Service) Start(router *gin.Engine) {
 
 	})
 
-	router.DELETE("/system/services", func(c *gin.Context) {
+	router.DELETE(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/services", "//", "/"), func(c *gin.Context) {
 		claims := u.ValidateUserJWT(c.Request)
 		if !u.IsUserAdmin(claims) {
 			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0004", Message: "Admin only operation."})

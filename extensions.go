@@ -2,7 +2,10 @@ package go_ztm
 
 import (
 	"math/rand"
+	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ConvertToInt(u interface{}, ernVal int) int {
@@ -29,4 +32,22 @@ func RandomString(n int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func InitServiceSJWT(c *gin.Context) (*SJWTClaims, *Service, bool) {
+
+	srv, ok := c.MustGet("service").(*Service)
+
+	if !ok || srv.Database == nil {
+		c.IndentedJSON(http.StatusExpectationFailed, nil)
+		return nil, nil, false
+	}
+
+	claims := srv.ValidateServiceJWT(c.Request)
+
+	if claims == nil {
+		return nil, nil, false
+	}
+
+	return claims, srv, true
 }

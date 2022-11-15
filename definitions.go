@@ -45,6 +45,7 @@ type ServicesStatus struct {
 type imsConfiguration struct {
 	Title       string
 	Abbeviation string
+	RootPath    string
 }
 
 type serviceConfigurationJWT struct {
