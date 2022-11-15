@@ -37,8 +37,9 @@ type ErrorMsg struct {
 }
 
 type ServicesStatus struct {
-	Name    string
-	IsAlive bool
+	Name     string
+	IsAlive  bool
+	Services []map[string]any
 }
 
 type imsConfiguration struct {

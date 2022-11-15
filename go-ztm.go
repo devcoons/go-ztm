@@ -649,21 +649,29 @@ func (u *Service) servicesHealthCheck() {
 			sclaims.SysAdm = false
 			sclaims.Hop = 1
 			token := u.SJwt.GenerateJWT(sclaims)
-			tServicesSts = append(tServicesSts, ServicesStatus{Name: nodeDetails.Name, IsAlive: u.serviceHealthPing(nodeDetails.Host+":"+strconv.Itoa(nodeDetails.Port)+"/", token)})
+			res, data := u.serviceHealthPing(nodeDetails.Host+":"+strconv.Itoa(nodeDetails.Port)+"/system/services/status", token)
+			tServicesSts = append(tServicesSts, ServicesStatus{Name: nodeDetails.Name, IsAlive: res, Services: data})
 		}
 		u.ServicesSts = tServicesSts
 		time.Sleep(7 * time.Second)
 	}
 }
 
-func (u *Service) serviceHealthPing(url string, token string) bool {
+func (u *Service) serviceHealthPing(url string, token string) (bool, []map[string]any) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Del("Authorization")
 	req.Header.Add("Authorization", u.SJwt.AuthType+" "+token)
 	req.Body = nil
-	_, errn := client.Do(req)
-	return errn == nil
+	r, errn := client.Do(req)
+	var result []map[string]any
+
+	if errn == nil {
+		body, _ := ioutil.ReadAll(r.Body)
+		json.Unmarshal(body, &result)
+	}
+
+	return errn == nil, result
 }
 
 func (u *Service) Start(router *gin.Engine) {
