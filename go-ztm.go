@@ -649,7 +649,7 @@ func (u *Service) servicesHealthCheck() {
 			sclaims.SysAdm = false
 			sclaims.Hop = 1
 			token := u.SJwt.GenerateJWT(sclaims)
-			res, data := u.serviceHealthPing(nodeDetails.Host+":"+strconv.Itoa(nodeDetails.Port)+"/system/services/status", token)
+			res, data := u.serviceHealthPing(nodeDetails.Host+":"+strconv.Itoa(nodeDetails.Port)+nodeDetails.URL+"/system/services/status", token)
 			tServicesSts = append(tServicesSts, ServicesStatus{Name: nodeDetails.Name, IsAlive: res, Services: data})
 		}
 		u.ServicesSts = tServicesSts
