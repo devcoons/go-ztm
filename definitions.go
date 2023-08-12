@@ -107,17 +107,25 @@ type serviceConfigurationNonce struct {
 	URL  string
 }
 
+type serviceConfigurationLoginThirdParty struct {
+	Provider string
+	Scope    string
+	ClientId string
+	Other    string
+}
+
 type ServiceConfiguration struct {
-	Ims          imsConfiguration
-	Secrets      []serviceConfigurationJWT
-	Database     serviceConfigurationDatabase
-	RedisDB      serviceConfigurationRedisDB
-	Gateways     []serviceConfigurationGateway
-	PathAuth     serviceConfigurationAuth
-	PathRegister serviceConfigurationRegister
-	PathNonce    serviceConfigurationNonce
-	PathAdmin    serviceConfigurationAdmin
-	Services     []serviceConfigurationService
+	Ims            imsConfiguration
+	Secrets        []serviceConfigurationJWT
+	Database       serviceConfigurationDatabase
+	RedisDB        serviceConfigurationRedisDB
+	Gateways       []serviceConfigurationGateway
+	AuthThirdParty []serviceConfigurationLoginThirdParty
+	PathAuth       serviceConfigurationAuth
+	PathRegister   serviceConfigurationRegister
+	PathNonce      serviceConfigurationNonce
+	PathAdmin      serviceConfigurationAdmin
+	Services       []serviceConfigurationService
 }
 
 type Service struct {

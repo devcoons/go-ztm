@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
@@ -110,7 +109,7 @@ func (u *ServiceConfiguration) Load(dbconfig string) bool {
 		fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteRed+" ERRN "+c.FmtReset, c.FmtFgBgWhiteBlack+"Cannot open the configuration file"+c.FmtReset)
 		return false
 	}
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteRed+" ERRN "+c.FmtReset, c.FmtFgBgWhiteBlack+"Cannot read the configuration file"+c.FmtReset)
 		return false
@@ -171,10 +170,7 @@ func (u *Service) SaveConfiguration() bool {
 	}
 
 	er5 := file.Close()
-	if er5 != nil {
-		return false
-	}
-	return true
+	return er5 == nil
 }
 
 func AddUSEService(u *Service) gin.HandlerFunc {
@@ -364,7 +360,7 @@ func (u *Service) DeleteUserNonceFromDB(userId int) bool {
 func UnmashalBody(body io.ReadCloser) map[string]interface{} {
 	var values map[string]interface{}
 
-	bbody, err := ioutil.ReadAll(body)
+	bbody, err := io.ReadAll(body)
 
 	if err != nil {
 		return nil
@@ -449,7 +445,7 @@ func (u *Service) IsUserAdmin(claims *UJWTClaims) bool {
 		if values["admin"] == nil || values["enabled"] == nil || values["username"] == nil || values["id"] == nil {
 			return false
 		}
-		if values["admin"].(bool) == true {
+		if values["admin"].(bool) {
 			return true
 		}
 	}
@@ -613,7 +609,7 @@ func (u *Service) RequestForwarder(c *gin.Context) {
 			req.Header.Set("Authorization", u.SJwt.AuthType+" "+token)
 			res, errn := client.Do(req)
 			if errn == nil {
-				body, _ := ioutil.ReadAll(res.Body)
+				body, _ := io.ReadAll(res.Body)
 				c.Data(res.StatusCode, res.Header.Get("Content-Type"), body)
 			} else {
 				c.Data(503, "application/json", nil)
@@ -667,7 +663,7 @@ func (u *Service) serviceHealthPing(url string, token string) (bool, []map[strin
 	var result []map[string]any
 
 	if errn == nil {
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		json.Unmarshal(body, &result)
 	}
 
@@ -728,8 +724,6 @@ func (u *Service) Start(router *gin.Engine) {
 			return
 		}
 		c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0013", Message: "Configuration could not be saved."})
-		return
-
 	})
 
 	router.DELETE(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/services", "//", "/"), func(c *gin.Context) {
