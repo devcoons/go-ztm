@@ -201,7 +201,11 @@ func (u *Service) ValidateUserJWT(r *http.Request) *UJWTClaims {
 	if u.Rdb == nil {
 		return nil
 	}
-
+	
+    	if u.UJwt == nil {
+      		return nil
+    	}
+	
 	iclaims, ok := u.UJwt.IsAuthorized(r)
 	if !ok {
 		return nil
@@ -234,6 +238,10 @@ func (u *Service) ValidateServiceJWT(r *http.Request) *SJWTClaims {
 		return nil
 	}
 
+    	if u.SJwt == nil {
+      		return nil
+    	}
+	
 	iclaims, ok := u.SJwt.IsAuthorized(r)
 
 	if !ok {
@@ -681,12 +689,20 @@ func (u *Service) Start(router *gin.Engine) {
 	})
 
 	router.GET(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/configuration", "//", "/"), func(c *gin.Context) {
+
 		claims := u.ValidateUserJWT(c.Request)
-		if !u.IsUserAdmin(claims) {
-			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0001", Message: "Admin only operation."})
-			return
-		}
-		c.IndentedJSON(http.StatusOK, u.Config)
+
+	        if claims == nil {
+	        	sclaims := u.ValidateServiceJWT(c.Request)   
+			if sclaims.SysAdm != true {
+	    			c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0001", Message: "Admin only operation."})
+	    			return
+	    		}            
+	        } else if !u.IsUserAdmin(claims) {
+	    		c.IndentedJSON(http.StatusForbidden, ErrorMsg{ErrorCode: "GW-S-0001", Message: "Admin only operation."})
+	    		return
+	        }
+		c.IndentedJSON(http.StatusOK, u.Config)  
 	})
 
 	router.POST(strings.ReplaceAll(u.Config.Ims.RootPath+"/ztm-framework/services", "//", "/"), func(c *gin.Context) {
