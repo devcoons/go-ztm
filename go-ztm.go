@@ -28,7 +28,7 @@ func (u *Service) Initialize(cfgpath string) bool {
 
 	u.Config = &ServiceConfiguration{}
 	r := u.Config.Load(cfgpath)
-	fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteBlue+" INFO "+c.FmtReset, c.FmtFgBgWhiteBlack+" Loading service configuration for: "+u.Config.Ims.Title+"."+c.FmtReset)
+	fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteBlue+" INFO "+c.FmtReset, c.FmtFgBgWhiteBlack+"Initializing service configuration for: "+u.Config.Ims.Title+"."+c.FmtReset)
 
 	if !r {
 		return false
@@ -121,7 +121,7 @@ func (u *ServiceConfiguration) Load(dbconfig string) bool {
 		return false
 	}
 
-	fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteBlue+" INFO "+c.FmtReset, c.FmtFgBgWhiteBlack+"Loading configuration file ("+dbconfig+")"+c.FmtReset)
+	fmt.Println(c.FmtFgBgWhiteLBlue+"[ IMS ]"+c.FmtReset, c.FmtFgBgWhiteBlue+" INFO "+c.FmtReset, c.FmtFgBgWhiteBlack+"Configuration file ("+dbconfig+") loaded succesfully"+c.FmtReset)
 
 	return true
 }
