@@ -480,7 +480,7 @@ func (u *Service) RequestWithClaims(path string, method string, header http.Head
 	req.Header.Set("Authorization", u.SJwt.AuthType+" "+token)
 	res, errn := client.Do(req)
 	if errn != nil || res.StatusCode != 200 {
-		return nil, errors.New("Failed")
+		return res, errors.New("Failed")
 	}
 
 	return res, nil
@@ -505,7 +505,7 @@ func (u *Service) Request(path string, method string, header http.Header, body i
 
 	res, errn := client.Do(req)
 	if errn != nil || res.StatusCode != 200 {
-		return nil, errors.New("Failed")
+		return res, errors.New("Failed")
 	}
 
 	return res, nil
@@ -531,7 +531,7 @@ func (u *Service) GWRequest(url string, method string, header http.Header, body 
 	res, errn := client.Do(req)
 
 	if errn != nil || res.StatusCode != 200 {
-		return nil, errors.New("Failed")
+		return res, errors.New("Failed")
 	}
 	return res, nil
 }
@@ -564,7 +564,7 @@ func (u *Service) SRVRequest(path string, method string, header http.Header, bod
 			res, errn := client.Do(req)
 
 			if errn != nil || res.StatusCode != 200 {
-				return nil, errors.New("Failed")
+				return res, errors.New("Failed")
 			}
 
 			return res, nil
@@ -620,7 +620,12 @@ func (u *Service) RequestForwarder(c *gin.Context) {
 				body, _ := io.ReadAll(res.Body)
 				c.Data(res.StatusCode, res.Header.Get("Content-Type"), body)
 			} else {
-				c.Data(503, "application/json", nil)
+				if res != nil {
+					body, _ := io.ReadAll(res.Body)
+					c.Data(503, "application/json", body)
+				} else {
+					c.Data(503, "application/json", nil)
+				}
 			}
 			return
 		}
