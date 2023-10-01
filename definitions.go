@@ -109,9 +109,9 @@ type serviceConfigurationNonce struct {
 
 type serviceConfigurationLoginThirdParty struct {
 	Provider string
-	Scope    string
 	ClientId string
-	Other    string
+	Secret   string
+	Url      string
 }
 
 type ServiceConfiguration struct {
