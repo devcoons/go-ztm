@@ -617,8 +617,13 @@ func (u *Service) RequestForwarder(c *gin.Context) {
 			req.Header.Set("Authorization", u.SJwt.AuthType+" "+token)
 			res, errn := client.Do(req)
 			if errn == nil {
-				body, _ := io.ReadAll(res.Body)
-				c.Data(res.StatusCode, res.Header.Get("Content-Type"), body)
+				if res.StatusCode == 303 {
+					body, _ := io.ReadAll(res.Body)
+					c.Redirect(303, string(body))
+				} else {
+					body, _ := io.ReadAll(res.Body)
+					c.Data(res.StatusCode, res.Header.Get("Content-Type"), body)
+				}
 			} else {
 				if res != nil {
 					body, _ := io.ReadAll(res.Body)
